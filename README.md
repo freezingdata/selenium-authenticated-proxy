@@ -34,11 +34,11 @@ Here is how you can set up the authenticated proxy for Selenium's Chrome WebDriv
 from selenium import webdriver
 from selenium_authenticated_proxy import SeleniumAuthenticatedProxy
 
-# Initialize SeleniumAuthenticatedProxy
-proxy_helper = SeleniumAuthenticatedProxy(proxy_url="http://username:password@proxy-server.com")
-
 # Initialize Chrome options
 chrome_options = webdriver.ChromeOptions()
+
+# Initialize SeleniumAuthenticatedProxy
+proxy_helper = SeleniumAuthenticatedProxy(proxy_url="http://username:password@proxy-server.com")
 
 # Enrich Chrome options with proxy authentication
 proxy_helper.enrich_chrome_options(chrome_options)
