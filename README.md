@@ -57,6 +57,10 @@ You can specify a custom folder for temporary storage of generated Chrome extens
 proxy_helper = SeleniumAuthenticatedProxy(proxy_url="http://username:password@proxy-server.com", tmp_folder="/path/to/tmp/folder")
 ```
 
+To enable the authentication to work properly a chrome extension is being generated (Thanks to [itsmnthn](https://stackoverflow.com/a/55582859/3691763)).
+If the URl doesn't change the extension will not be regenerated. The URL is hashed so that only when the URL has changed (or the tmp folder has changed) a new zip file will be generated.
+
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
