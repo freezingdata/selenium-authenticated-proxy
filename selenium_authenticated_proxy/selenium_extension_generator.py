@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 import zipfile
 import os
 
+# Thanks to https://bugs.chromium.org/p/chromium/issues/detail?id=1135492
+
 DEFAULT_MANIFEST = """
 {
     "version": "1.0.0",
