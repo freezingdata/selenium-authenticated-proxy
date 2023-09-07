@@ -1,0 +1,12 @@
+[MASTER]
+
+# Specify the maximum line length
+max-line-length = 117
+
+# Ignore certain errors and warnings
+disable = missing-docstring,invalid-name
+
+[MESSAGES CONTROL]
+
+# Disable certain messages
+disable = C0103

@@ -1,0 +1,5 @@
+# .coveragerc
+[report]
+show_missing = True
+omit =
+    **/i_*.py
