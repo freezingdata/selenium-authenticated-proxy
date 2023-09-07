@@ -1,6 +1,7 @@
 import os
 import hashlib
-import base64
+
+import urllib3
 from selenium_authenticated_proxy.selenium_extension_generator import SeleniumExtensionGenerator
 
 class SeleniumAuthenticatedProxy:
@@ -11,20 +12,22 @@ class SeleniumAuthenticatedProxy:
 
     def _get_zip_filename(self):
         input_string = f"{self.proxy_url}"
-        
+
         hasher = hashlib.sha256()
         hasher.update(input_string.encode())
-        
+
         # Get the digest (the hashed value)
         digest = hasher.digest()
-        
-        # Base64 encode the digest
-        base64_digest = base64.b64encode(digest)
-        
-        return f"{base64_digest.decode()}.zip"
+
+        # Hex encode the digest
+        hex_digest = digest.hex()
+
+        return f"{hex_digest}"
 
     def _get_zip_filepath(self):
         """Get the full file path for the ZIP file to be stored."""
+        if not os.path.exists(self.tmp_folder):
+            os.mkdir(self.tmp_folder)
         return os.path.join(self.tmp_folder, self._get_zip_filename())
     
     def _generate_plugin_file(self):
@@ -36,13 +39,18 @@ class SeleniumAuthenticatedProxy:
         Check if the plugin file already exists.
         If not, generate a new plugin file.
         """
-        if not os.path.isfile(self._get_zip_filepath()):
+        if not os.path.exists(self._get_zip_filepath()):
             self._generate_plugin_file()
 
         # Return path to plugin file
         return self._get_zip_filepath()
 
+    def _get_unauthenticated_url(self):
+        result = urllib3.util.parse_url(self.proxy_url)
+        return f'{result.scheme}://{result.host}:{result.port}'
+
     def enrich_chrome_options(self, chrome_options):
         """Add the generated extension to Chrome options."""
-        chrome_options.add_extension(self.get_or_generate_plugin_file())
+        chrome_options.add_argument(f"--load-extension={self.get_or_generate_plugin_file()}")
+        chrome_options.add_argument(f"--proxy-server={self._get_unauthenticated_url()}")
         return chrome_options
