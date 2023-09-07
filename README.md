@@ -32,7 +32,7 @@ Here is how you can set up the authenticated proxy for Selenium's Chrome WebDriv
 
 ```python
 from selenium import webdriver
-from selenium_authenticated_proxy_helper import SeleniumAuthenticatedProxy
+from selenium_authenticated_proxy import SeleniumAuthenticatedProxy
 
 # Initialize SeleniumAuthenticatedProxy
 proxy_helper = SeleniumAuthenticatedProxy(proxy_url="http://username:password@proxy-server.com")
