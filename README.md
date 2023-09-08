@@ -21,7 +21,7 @@ The Selenium Authenticated Proxy Helper is a Python utility designed to seamless
 You can install this package via pip:
 
 ```bash
-pip install selenium-authenticated-proxy-helper
+pip install selenium-authenticated-proxy
 ```
 
 ## Usage
