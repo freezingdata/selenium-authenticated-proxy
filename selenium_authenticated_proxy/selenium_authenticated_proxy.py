@@ -48,9 +48,14 @@ class SeleniumAuthenticatedProxy:
     def _get_unauthenticated_url(self):
         result = urllib3.util.parse_url(self.proxy_url)
         return f'{result.scheme}://{result.host}:{result.port}'
+    
+    def _is_authenticated_url(self):
+        result = urllib3.util.parse_url(self.proxy_url)
+        return result.auth is not None
 
     def enrich_chrome_options(self, chrome_options):
         """Add the generated extension to Chrome options."""
-        chrome_options.add_argument(f"--load-extension={self.get_or_generate_plugin_file()}")
+        if self._is_authenticated_url():
+            chrome_options.add_argument(f"--load-extension={self.get_or_generate_plugin_file()}")
         chrome_options.add_argument(f"--proxy-server={self._get_unauthenticated_url()}")
         return chrome_options
