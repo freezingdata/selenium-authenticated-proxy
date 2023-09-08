@@ -27,6 +27,6 @@ setuptools.setup(
     url="https://github.com/bubblegumsoldier/selenium-authenticated-proxy",
     long_description=get_readme_long(),
     long_description_content_type="text/markdown",
-    keywords=["print", "pdf", "converter", "selenium"],
+    keywords=["proxy", "selenium", "auth", "selenium"],
     install_requires=['selenium'],
 )
