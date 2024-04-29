@@ -55,9 +55,6 @@ class SeleniumExtensionGenerator:
             f.write(DEFAULT_MANIFEST)
         with open(os.path.join(plugin_file_path, "background.js"), "w") as f:
             f.write(self._get_background_js(proxy_url))
-            print("Background.js file created.")
-        with open(os.path.join(plugin_file_path, "background.js"), "r") as f:
-            print(f.read())
 
     def _get_background_js(self, proxy_url):
         urlparse_result = urlparse(proxy_url)

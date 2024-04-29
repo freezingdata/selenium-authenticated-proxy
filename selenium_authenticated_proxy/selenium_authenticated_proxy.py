@@ -55,7 +55,11 @@ class SeleniumAuthenticatedProxy:
 
     def _get_unauthenticated_url(self):
         result = urlparse(self.proxy_url)
-        return f'{result.scheme}://{result.hostname}:{result.port}'
+        return f'{result.hostname}:{result.port}'
+
+    def _get_scheme(self):
+        result = urlparse(self.proxy_url)
+        return result.scheme
     
     def _is_authenticated_url(self):
         result = urlparse(self.proxy_url)
@@ -65,5 +69,6 @@ class SeleniumAuthenticatedProxy:
         """Add the generated extension to Chrome options."""
         if self._is_authenticated_url():
             chrome_options.add_argument(f"--load-extension={self.get_or_generate_plugin_file()}")
-        chrome_options.add_argument(f"--proxy-server={self._get_unauthenticated_url()}")
+        chrome_options.add_argument(f"--proxy-server='{self._get_scheme()}={self._get_unauthenticated_url()}'")
+        print(self._get_unauthenticated_url())
         return chrome_options

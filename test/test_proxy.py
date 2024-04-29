@@ -19,7 +19,6 @@ class TestProxy(unittest.TestCase):
         for i in range(repeat):
             chrome_options = webdriver.ChromeOptions()
             # chrome_options.add_argument('--headless')
-            print(PROXY_URL)
             proxy_helper = SeleniumAuthenticatedProxy(proxy_url=PROXY_URL, disable_caching=True)
             proxy_helper.enrich_chrome_options(chrome_options)
             driver = webdriver.Chrome(options=chrome_options)
