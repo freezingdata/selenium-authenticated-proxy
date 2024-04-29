@@ -1,6 +1,7 @@
 
-from urllib.parse import urlparse
 import os
+from typing import Optional
+from urllib.parse import urlparse
 
 # Thanks to https://bugs.chromium.org/p/chromium/issues/detail?id=1135492
 
@@ -43,19 +44,24 @@ chrome.webRequest.onAuthRequired.addListener(
 
 
 class SeleniumExtensionGenerator:
-    @classmethod
-    def generate_extension_zip(self, proxy_url=None, plugin_file_path=None):
-        os.mkdir(plugin_file_path)
+    def generate_extension_zip(self, proxy_url: Optional[str]=None, plugin_file_path: Optional[str]=None):
+        if not plugin_file_path:
+            return
+        
+        if not os.path.isdir(plugin_file_path):
+            os.makedirs(plugin_file_path)
+
         with open(os.path.join(plugin_file_path, "manifest.json"), 'w') as f:
             f.write(DEFAULT_MANIFEST)
         with open(os.path.join(plugin_file_path, "background.js"), "w") as f:
             f.write(self._get_background_js(proxy_url))
+            print("Background.js file created.")
+        with open(os.path.join(plugin_file_path, "background.js"), "r") as f:
+            print(f.read())
 
-    @classmethod
     def _get_background_js(self, proxy_url):
         urlparse_result = urlparse(proxy_url)
         scheme = urlparse_result.scheme
-        host = urlparse_result.hostname
         port = urlparse_result.port
         username = urlparse_result.username
         password = urlparse_result.password

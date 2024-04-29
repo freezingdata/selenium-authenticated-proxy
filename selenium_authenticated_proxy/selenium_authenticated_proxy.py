@@ -1,13 +1,17 @@
-import os
 import hashlib
+import os
+import shutil
+from urllib.parse import urlparse
 
-import urllib3
-from selenium_authenticated_proxy.selenium_extension_generator import SeleniumExtensionGenerator
+from selenium_authenticated_proxy.selenium_extension_generator import \
+    SeleniumExtensionGenerator
+
 
 class SeleniumAuthenticatedProxy:
-    def __init__(self, proxy_url=None, tmp_folder=None):
+    def __init__(self, proxy_url=None, tmp_folder=None, disable_caching=False):
         """Constructor for initializing proxy_url and tmp_folder."""
         self.proxy_url = proxy_url
+        self.disable_caching = disable_caching
         self.tmp_folder = tmp_folder or os.path.abspath(os.path.join(os.path.dirname(__file__), "tmp"))
 
     def _get_zip_filename(self):
@@ -39,6 +43,10 @@ class SeleniumAuthenticatedProxy:
         Check if the plugin file already exists.
         If not, generate a new plugin file.
         """
+        if self.disable_caching and os.path.exists(self._get_zip_filepath()):
+            # remove the folder at the path
+            shutil.rmtree(self._get_zip_filepath())
+
         if not os.path.exists(self._get_zip_filepath()):
             self._generate_plugin_file()
 
@@ -46,12 +54,12 @@ class SeleniumAuthenticatedProxy:
         return self._get_zip_filepath()
 
     def _get_unauthenticated_url(self):
-        result = urllib3.util.parse_url(self.proxy_url)
-        return f'{result.scheme}://{result.host}:{result.port}'
+        result = urlparse(self.proxy_url)
+        return f'{result.scheme}://{result.hostname}:{result.port}'
     
     def _is_authenticated_url(self):
-        result = urllib3.util.parse_url(self.proxy_url)
-        return result.auth is not None
+        result = urlparse(self.proxy_url)
+        return result.username is not None
 
     def enrich_chrome_options(self, chrome_options):
         """Add the generated extension to Chrome options."""

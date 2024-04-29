@@ -2,3 +2,4 @@ selenium
 pytest
 pytest-cov
 pylint
+python-dotenv
