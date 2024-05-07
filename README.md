@@ -60,8 +60,16 @@ proxy_helper = SeleniumAuthenticatedProxy(proxy_url="http://username:password@pr
 To enable the authentication to work properly a chrome extension is being generated (Thanks to [itsmnthn](https://stackoverflow.com/a/55582859/3691763) with an [improvement for manifest v3](https://bugs.chromium.org/p/chromium/issues/detail?id=1135492)).
 If the URl doesn't change the extension will not be regenerated. The URL is hashed so that only when the URL has changed (or the tmp folder has changed) a new zip file will be generated.
 
+### Specific issues with headless chrome
+
+If you want to use headless chrome, this functionality only works if you use the following method:
+
+```python
+ops.add_argument('--headless=new')
+```
+
+The `--headless` method or also the `--headless=chrome` method does not work anymore!
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
-
