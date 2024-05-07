@@ -1,0 +1,39 @@
+name: Python tests, build, and deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          pip install wheel
+          pip install twine
+      - name: Build wheel
+        run: python setup.py bdist_wheel
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: wheel
+          path: dist/*.whl
+        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload package to PyPI
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: twine upload dist/*.whl

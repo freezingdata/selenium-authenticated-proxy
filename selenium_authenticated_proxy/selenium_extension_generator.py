@@ -1,8 +1,12 @@
-
-from urllib.parse import urlparse
 import os
+from typing import Optional
+from urllib.parse import urlparse
+import zipfile
 
 # Thanks to https://bugs.chromium.org/p/chromium/issues/detail?id=1135492
+# Latest changes required that the proxy is specified in the extension
+# the --proxy-server flag is not enough anymore
+# https://www.browserstack.com/guide/set-proxy-in-selenium
 
 DEFAULT_MANIFEST = """
 {
@@ -10,6 +14,10 @@ DEFAULT_MANIFEST = """
     "manifest_version": 3,
     "name": "Chrome Proxy",
     "permissions": [
+        "proxy",
+        "tabs",
+        "unlimitedStorage",
+        "storage",
         "webRequest",
         "webRequestAuthProvider"
     ],
@@ -23,7 +31,24 @@ DEFAULT_MANIFEST = """
 }
 """
 
-DEFAULT_BACKGROUND_JS = """
+DEFAULT_BACKGROUND_JS_PROXY = """
+const config = {
+    mode: "fixed_servers",
+    rules: {
+        singleProxy: {
+            scheme: "%s",
+            host: "%s",
+            port: %s
+        }
+    }
+}
+chrome.proxy.settings.set({
+    value: config,
+    scope: 'regular'
+}, () => {});
+"""
+
+DEFAULT_BACKGROUND_AUTO_AUTH = """
 chrome.webRequest.onAuthRequired.addListener(
   (details, callback) => {
     const authCredentials = {
@@ -32,7 +57,7 @@ chrome.webRequest.onAuthRequired.addListener(
     };
     setTimeout(() => {
       callback({ authCredentials });
-    }, 20);
+    }, 200);
   },
   { urls: ["<all_urls>"] },
   ["asyncBlocking"]
@@ -41,27 +66,55 @@ chrome.webRequest.onAuthRequired.addListener(
 """
 
 
-
 class SeleniumExtensionGenerator:
-    @classmethod
-    def generate_extension_zip(self, proxy_url=None, plugin_file_path=None):
-        os.mkdir(plugin_file_path)
-        with open(os.path.join(plugin_file_path, "manifest.json"), 'w') as f:
+    def generate_extension_zip(
+        self,
+        proxy_url: Optional[str] = None,
+        plugin_file_path: Optional[str] = None,
+    ) -> str:
+        if not plugin_file_path:
+            return
+
+        if not os.path.isdir(plugin_file_path):
+            os.makedirs(plugin_file_path)
+
+        with open(os.path.join(plugin_file_path, "manifest.json"), "w") as f:
             f.write(DEFAULT_MANIFEST)
         with open(os.path.join(plugin_file_path, "background.js"), "w") as f:
             f.write(self._get_background_js(proxy_url))
 
-    @classmethod
+        # make zip file
+        with zipfile.ZipFile(f"{plugin_file_path}.zip", "w") as zipf:
+            for root, _, files in os.walk(plugin_file_path):
+                for file in files:
+                    zipf.write(
+                        os.path.join(root, file),
+                        os.path.relpath(
+                            os.path.join(root, file), plugin_file_path
+                        ),
+                    )
+
+        return f"{plugin_file_path}.zip"
+
     def _get_background_js(self, proxy_url):
         urlparse_result = urlparse(proxy_url)
         scheme = urlparse_result.scheme
-        host = urlparse_result.hostname
         port = urlparse_result.port
         username = urlparse_result.username
         password = urlparse_result.password
         if not port:
-            if 'https' in scheme:
-                port = '443'
+            if "https" in scheme:
+                port = "443"
             else:
-                port = '80'
-        return DEFAULT_BACKGROUND_JS % (username, password)
+                port = "80"
+        BACKGROUND_JS = DEFAULT_BACKGROUND_JS_PROXY % (
+            scheme,
+            urlparse_result.hostname,
+            port,
+        )
+        if username and password:
+            BACKGROUND_JS += DEFAULT_BACKGROUND_AUTO_AUTH % (
+                username,
+                password,
+            )
+        return BACKGROUND_JS
