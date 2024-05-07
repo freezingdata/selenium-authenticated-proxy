@@ -55,6 +55,8 @@ class SeleniumAuthenticatedProxy:
 
     def enrich_chrome_options(self, chrome_options):
         """Add the generated extension to Chrome options."""
+        if not self.proxy_url:
+            return chrome_options
         if self._is_authenticated_url():
             chrome_options.add_extension(self._generate_plugin_file())
         chrome_options.add_argument(
