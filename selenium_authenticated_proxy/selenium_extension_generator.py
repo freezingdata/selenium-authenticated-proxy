@@ -57,7 +57,7 @@ chrome.webRequest.onAuthRequired.addListener(
     };
     setTimeout(() => {
       callback({ authCredentials });
-    }, 2000);
+    }, 200);
   },
   { urls: ["<all_urls>"] },
   ["asyncBlocking"]
