@@ -23,5 +23,8 @@ jobs:
           docker build --rm -t test .
 
       - name: Run Docker container
+        with:
+          PROXY_URL: ${{ secrets.PROXY_URL }}
+          PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
         run: |
           docker run --rm -t -v ./:/root/selenium-authenticated-proxy -e PROXY_URL=$PROXY_URL -e PUBLIC_IP=$PUBLIC_IP test bash test.sh
