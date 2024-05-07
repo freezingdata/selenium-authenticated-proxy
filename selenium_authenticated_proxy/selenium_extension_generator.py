@@ -12,7 +12,8 @@ DEFAULT_MANIFEST = """
     "name": "Chrome Proxy",
     "permissions": [
         "webRequest",
-        "webRequestAuthProvider"
+        "webRequestAuthProvider",
+        "background"
     ],
     "background": {
         "service_worker": "background.js"
