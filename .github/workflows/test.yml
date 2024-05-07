@@ -24,4 +24,4 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run --rm -t -v ${{ github.workspace }}:/root/${GITHUB_WORKSPACE##*/} test bash test.sh
+          docker run --rm -t -v ./:/root/selenium-authenticated-proxy test bash test.sh

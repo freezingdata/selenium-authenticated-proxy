@@ -22,15 +22,39 @@ RUN ~/miniconda3/bin/conda config --set auto_activate_base false
 
 RUN mkdir -p /root/selenium-authenticated-proxy
 
-# Set environment variables for Chromium and Chromedriver paths
-ENV CHROME_PATH="/usr/bin/chromium"
-ENV CHROME_DRIVER_PATH="/usr/bin/chromedriver"
-
 # Install Chromium and Chromedriver
 RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-driver \
-    && rm -rf /var/lib/apt/lists/*
+    curl unzip xvfb libxi6 libgconf-2-4 gnupg wget
+
+# Google Chrome
+RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get -y update \
+    && apt-get -y install google-chrome-stable
+ARG VERSION=114.0.5735.198-1
+# Google Chrome
+RUN wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${VERSION}_amd64.deb \
+    && dpkg -i google-chrome-stable_${VERSION}_amd64.deb || apt-get install -fy \
+    && rm google-chrome-stable_${VERSION}_amd64.deb
+
+# ChromeDriver
+RUN CHROME_VERSION=$(google-chrome --product-version | cut -d'.' -f1) \
+    && CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) \
+    && curl -sS -O https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip -d /usr/bin \
+    && chmod +x /usr/bin/chromedriver \
+    && rm chromedriver_linux64.zip
+RUN CHROME_MAJOR_VERSION=$(google-chrome --product-version | cut -d'.' -f1) \
+    && CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR_VERSION}) \
+    && wget -N http://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/ \
+    && unzip ~/chromedriver_linux64.zip -d ~/ \
+    && rm ~/chromedriver_linux64.zip \
+    && mv -f ~/chromedriver /usr/local/bin/chromedriver \
+    && chown root:root /usr/local/bin/chromedriver \
+    && chmod 0755 /usr/local/bin/chromedriver
+
+ENV CHROME_DRIVER_PATH=/usr/local/bin/chromedriver
+ENV CHROME_PATH=/usr/bin/google-chrome
 
 WORKDIR /root/selenium-authenticated-proxy
 
