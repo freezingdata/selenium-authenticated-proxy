@@ -23,7 +23,7 @@ jobs:
           docker build --rm -t test .
 
       - name: Run Docker container
-        with:
+        env:
           PROXY_URL: ${{ secrets.PROXY_URL }}
           PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
         run: |
