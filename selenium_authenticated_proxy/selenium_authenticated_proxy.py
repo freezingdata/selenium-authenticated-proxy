@@ -8,7 +8,9 @@ from selenium_authenticated_proxy.selenium_extension_generator import (
 
 
 class SeleniumAuthenticatedProxy:
-    def __init__(self, proxy_url=None, tmp_folder=None, use_legacy_extension=False):
+    def __init__(
+        self, proxy_url=None, tmp_folder=None, use_legacy_extension=False
+    ):
         """Constructor for initializing proxy_url and tmp_folder."""
         self.proxy_url = proxy_url
         self.tmp_folder = tmp_folder or os.path.abspath(
@@ -56,7 +58,9 @@ class SeleniumAuthenticatedProxy:
 
     def _add_extension(self, chrome_options, extension_file: str):
         if self.use_legacy_extension:
-            chrome_options.add_argument(f"--load-extension={extension_file}")
+            chrome_options.add_argument(
+                f"--load-extension={extension_file[:-4]}"
+            )
         else:
             chrome_options.add_extension(extension_file)
 
