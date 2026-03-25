@@ -51,18 +51,16 @@ chrome.proxy.settings.set({
 DEFAULT_BACKGROUND_AUTO_AUTH = """
 chrome.webRequest.onAuthRequired.addListener(
   (details, callback) => {
-    const authCredentials = {
-      username: "%s",
-      password: "%s",
-    };
-    setTimeout(() => {
-      callback({ authCredentials });
-    }, 200);
+    callback({
+      authCredentials: {
+        username: "%s",
+        password: "%s",
+      }
+    });
   },
   { urls: ["<all_urls>"] },
   ["asyncBlocking"]
 );
-
 """
 
 
