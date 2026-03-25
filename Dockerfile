@@ -31,7 +31,7 @@ RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-ke
     && echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
     && apt-get -y update \
     && apt-get -y install google-chrome-stable
-ARG VERSION=114.0.5735.198-1
+ARG VERSION=146.0.7680.153
 # Google Chrome
 RUN wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${VERSION}_amd64.deb \
     && dpkg -i google-chrome-stable_${VERSION}_amd64.deb || apt-get install -fy \
